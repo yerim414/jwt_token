@@ -39,7 +39,7 @@ def auth_check(credentials: HTTPAuthorizationCredentials = Depends(security)):
 
     token = credentials.credentials
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = decode_token(token)
         user_id = payload.get("user_id")
         db = SessionLocal()
         user = db.query(User).filter(User.SEQ == user_id).first()
