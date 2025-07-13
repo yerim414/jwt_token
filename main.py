@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db import get_db
+from jwt_handler import auth_check
 from models.user_model import User
 from schemas.user_schemas import UserCreate, UserLogin
 from passlib.hash import bcrypt
@@ -18,3 +19,15 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 @app.post("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
     return login_user(user, db)
+
+@app.get("/me")
+def read_users_me(current_user: User = Depends(auth_check)):
+    return {
+        "SEQ": current_user.SEQ,
+        "ID": current_user.ID,
+        "NAME": current_user.NAME
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", port=8000)
