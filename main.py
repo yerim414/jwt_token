@@ -1,33 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
-from db import get_db
-from jwt_handler import auth_check
-from models.user_model import User
-from schemas.user_schemas import UserCreate, UserLogin
-from passlib.hash import bcrypt
-from services.user_service import create_user, login_user
+from fastapi import FastAPI
+from routers.auth import router as auth_router
+import uvicorn
 
 app = FastAPI()
 
-@app.post("/signup")
-def signup(user: UserCreate, db: Session = Depends(get_db)):
-    new_user = create_user(user, db)
-    if user is None:
-        raise HTTPException(status_code=400, detail = "생성에 실패하였습니다.")
-    return {"code":201,"user_seq": new_user.SEQ}
-
-@app.post("/login")
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    return login_user(user, db)
-
-@app.get("/me")
-def read_users_me(current_user: User = Depends(auth_check)):
-    return {
-        "SEQ": current_user.SEQ,
-        "ID": current_user.ID,
-        "NAME": current_user.NAME
-    }
+# 라우터 등록
+app.include_router(auth_router)
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
