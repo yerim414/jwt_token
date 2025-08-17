@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
 from db import Base
 
 class User(Base):
@@ -9,3 +10,5 @@ class User(Base):
     PWD = Column(String(100), nullable=False)
     NAME = Column(String(50), nullable=False)
     DELETED_AT = Column(DateTime, nullable=True)
+
+    todos = relationship("ToDo", back_populates="OWNER")
